@@ -5,10 +5,16 @@ import json
 import requests
 from flask import Flask, request
 
+from wit import Wit
+
 app = Flask(__name__)
 
 PAGE_ACCESS_TOKEN = "EAAINtvUAPRYBAM2OzXWi7mQSJpyHioQZAKxZBRlWdTtCIHkQXmpUjgjmdzS4BmAqeXsh7ph1zcNW2d4wjwUiit4dJZAodzWplvQZBB7OmZAfxVspHVVsVKHitarX0dpnUn01M70CvSiJZBgxXt4RUqsaWCUjlkgSRlMKDwuMZBDgwZDZD"
 VERIFY_TOKEN = "rob_never_stops_spinning"
+
+WIT_ACCESS_TOKEN = "2FYQTTTCDRW2D5ESPSVC6OK6TWT6VJLW"
+
+client = Wit(access_token=WIT_ACCESS_TOKEN)
 
 @app.route('/', methods=['GET'])
 def verify():
@@ -41,7 +47,23 @@ def webhook():
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
                     message_text = messaging_event["message"]["text"]  # the message's text
 
-                    send_message(sender_id, "got it, thanks!")
+                    resp = client.message(message_text)
+                    intents = []
+                    if resp['entities'] and resp['entities']['intent']:
+                      intents = [intent['value'] for intent in resp['entities']['intent']]
+                    print(intents)
+                    if 'events' in intents:
+                      send_message(sender_id, "here are our events! https://www.facebook.com/ieeeut/events/")
+                    elif 'where' in intents:
+                      send_message(sender_id, "we're in anna hiss 134!")
+                    elif 'robspin' in intents:
+                      send_message(sender_id, "http://robspin.com !")
+                    else:
+                      send_message(sender_id, "I didn't understand that. Here's what I can do:\n"
+                                   "- Tell you about upcoming events\n"
+                                   "- Tell you where we are\n"
+                                   "- Tell you about robspin\n")
+                    # send_message(sender_id, "got it, thanks!")
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
