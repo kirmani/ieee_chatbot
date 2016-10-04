@@ -7,21 +7,18 @@ from flask import Flask, request
 
 from wit import Wit
 
+import constants
+
 app = Flask(__name__)
 
-PAGE_ACCESS_TOKEN = "EAAINtvUAPRYBAM2OzXWi7mQSJpyHioQZAKxZBRlWdTtCIHkQXmpUjgjmdzS4BmAqeXsh7ph1zcNW2d4wjwUiit4dJZAodzWplvQZBB7OmZAfxVspHVVsVKHitarX0dpnUn01M70CvSiJZBgxXt4RUqsaWCUjlkgSRlMKDwuMZBDgwZDZD"
-VERIFY_TOKEN = "rob_never_stops_spinning"
-
-WIT_ACCESS_TOKEN = "2FYQTTTCDRW2D5ESPSVC6OK6TWT6VJLW"
-
-client = Wit(access_token=WIT_ACCESS_TOKEN)
+client = Wit(access_token=constants.WIT_ACCESS_TOKEN)
 
 @app.route('/', methods=['GET'])
 def verify():
     # when the endpoint is registered as a webhook, it must echo back
     # the 'hub.challenge' value it receives in the query arguments
     if request.args.get("hub.mode") == "subscribe" and request.args.get("hub.challenge"):
-        if not request.args.get("hub.verify_token") == VERIFY_TOKEN:
+        if not request.args.get("hub.verify_token") == constants.VERIFY_TOKEN:
             return "Verification token mismatch", 403
         return request.args["hub.challenge"], 200
 
@@ -82,7 +79,7 @@ def send_message(recipient_id, message_text):
     log("sending message to {recipient}: {text}".format(recipient=recipient_id, text=message_text))
 
     params = {
-        "access_token": PAGE_ACCESS_TOKEN
+        "access_token": constants.PAGE_ACCESS_TOKEN
     }
     headers = {
         "Content-Type": "application/json"
