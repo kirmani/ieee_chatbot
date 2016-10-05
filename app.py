@@ -42,25 +42,29 @@ def webhook():
 
                     sender_id = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                     recipient_id = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
-                    message_text = messaging_event["message"]["text"]  # the message's text
-
-                    resp = client.message(message_text)
-                    intents = []
-                    if resp['entities'] and resp['entities']['intent']:
-                      intents = [intent['value'] for intent in resp['entities']['intent']]
-                    print(intents)
-                    if 'events' in intents:
-                      send_message(sender_id, "here are our events! https://www.facebook.com/ieeeut/events/")
-                    elif 'where' in intents:
-                      send_message(sender_id, "we're in anna hiss 134!")
-                    elif 'robspin' in intents:
-                      send_message(sender_id, "http://robspin.com !")
+                    if "text" not in messaging_event["message"]:
+                      send_message(sender_id, "nice!")
                     else:
-                      send_message(sender_id, "I didn't understand that. Here's what I can do:\n"
-                                   "- Tell you about upcoming events\n"
-                                   "- Tell you where we are\n"
-                                   "- Tell you about robspin\n")
-                    # send_message(sender_id, "got it, thanks!")
+                      message_text = messaging_event["message"]["text"] # the message's text
+
+                      print("Message Text: %s" % message_text)
+                      resp = client.message(message_text)
+                      intents = []
+                      if resp['entities'] and resp['entities']['intent']:
+                        intents = [intent['value'] for intent in resp['entities']['intent']]
+                      print(intents)
+                      if 'events' in intents:
+                        send_message(sender_id, "here are our events! https://www.facebook.com/ieeeut/events/")
+                      elif 'where' in intents:
+                        send_message(sender_id, "we're in anna hiss 134!")
+                      elif 'robspin' in intents:
+                        send_message(sender_id, "http://robspin.com !")
+                      else:
+                        send_message(sender_id, "I didn't understand that. Here's what I can do:\n"
+                                     "- Tell you about upcoming events\n"
+                                     "- Tell you where we are\n"
+                                     "- Tell you about robspin\n")
+                      # send_message(sender_id, "got it, thanks!")
 
                 if messaging_event.get("delivery"):  # delivery confirmation
                     pass
